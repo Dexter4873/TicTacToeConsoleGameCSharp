@@ -1,10 +1,12 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace TicTacToeConsole;
 
 public class Cli
 {
     private readonly TicTacToe _game = new();
+    private readonly Regex _regex = new("^[1-3] [1-3]$");
 
     public void Start()
     {
@@ -15,10 +17,19 @@ public class Cli
         while (!_game.Finished)
         {
             Console.WriteLine(_game.BoardToString());
-            Console.Write($"Turns {_game.ActualTurn}: ");
-            var line = Console.ReadLine();
-            var cords = line?.Split(" ");
-            _game.NextPlay(int.Parse(cords![0]) - 1, int.Parse(cords[1]) - 1);
+            string line;
+            bool validCords;
+
+            do
+            {
+                Console.Write($"Turns {_game.ActualTurn}: ");
+                line = Console.ReadLine()!;
+                validCords = _regex.IsMatch(line);
+                if (!validCords) Console.WriteLine("Coordinates you enter are not valid");
+            } while (!validCords);
+            
+            var cords = line.Split(" ");
+            _game.NextPlay(int.Parse(cords[0]) - 1, int.Parse(cords[1]) - 1);
         }
 
         Console.WriteLine(_game.BoardToString());
